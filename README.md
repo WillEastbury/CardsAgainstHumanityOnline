@@ -1,10 +1,15 @@
 # Cards Against Humanity Online
+
+**Temporary Repo - intention is to bring in the Bedlam Online Cardset for an internal version of this game. **
+
+Original readme is below. 
+
 Cards Against Humanity Online is a web-based online multiplayer version of the card game 'Cards Against Humanity' which you can play together with your friends. It can be hosted on any computer supporting the .NET Framework 4.0 or higher and played on every modern device capable of browsing the web.
 
 The development of this app started due to me not liking how [Pretend You're Xyzzy](pretendyoure.xyz) forces all players to stay connected and does not really allow long-term game sessions with long breaks.
 
 ### Some technical notes
-Cards Against Humaniy Online is based around a webserver developed in C# and all of the communication is done via http requests. All the webpages are generated server-side and do not require anything else besides what is sent with the initial request. This means that the whole application uses neither fonts, nor external style sheets & javascript files, images or even gigantic JS frameworks. Furthermore, every request over a certain size is automatically gzipped but nothing is ever minified.
+Cards Against Humanity Online is based around a webserver developed in C# and all of the communication is done via http requests. All the webpages are generated server-side and do not require anything else besides what is sent with the initial request. This means that the whole application uses neither fonts, nor external style sheets & javascript files, images or even gigantic JS frameworks. Furthermore, every request over a certain size is automatically gzipped but nothing is ever minified.
 
 The result is that an active game takes ~2KB for the initial load and then about **500KB per hour** of gameplay.
 
