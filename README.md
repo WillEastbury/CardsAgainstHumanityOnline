@@ -1,26 +1,70 @@
-# Cards Against Humanity Online
+# Bedlam Online
 
-**Temporary Repo - intention is to bring in the Bedlam Online Cardset for an internal version of this game. **
+An implementation of the Card game Bedlam by KC Lemson in C# 7.
 
-Original readme is below. 
+```mermaid
+classDiagram
+    class GameHost {
+      +List<BlackCard> BaseBlackCards
+      +List<WhiteCard> BaseWhiteCards
+      +List<Lobby> Lobbies
+      +Initialize(): Task
+      +CreateLobby(): Lobby
+      +GetLeaderboard(): List<Player>
+    }
+    GameHost "1" --> "*" Lobby : manages
 
-Cards Against Humanity Online is a web-based online multiplayer version of the card game 'Cards Against Humanity' which you can play together with your friends. It can be hosted on any computer supporting the .NET Framework 4.0 or higher and played on every modern device capable of browsing the web.
+    class Lobby {
+      +List<Player> Players
+      +List<Round> Rounds
+      +CardDeck Deck
+      +string LobbyName
+      +Join(Player): void
+      +StartRound(): void
+      +PlayCard(Player, WhiteCard, string): void
+      +ChooseWinner(Player, Player, string): void
+    }
+    Lobby "1" --> "*" Player : contains
+    Lobby "1" --> "*" Round : has
+    Lobby "1" --> "1" CardDeck : has
 
-The development of this app started due to me not liking how [Pretend You're Xyzzy](pretendyoure.xyz) forces all players to stay connected and does not really allow long-term game sessions with long breaks.
+    class Player {
+      +string Name
+      +int Score
+      +string AccessToken
+      +bool HasPlayedThisRound
+      +List<WhiteCard> Hand
+    }
 
-### Some technical notes
-Cards Against Humanity Online is based around a webserver developed in C# and all of the communication is done via http requests. All the webpages are generated server-side and do not require anything else besides what is sent with the initial request. This means that the whole application uses neither fonts, nor external style sheets & javascript files, images or even gigantic JS frameworks. Furthermore, every request over a certain size is automatically gzipped but nothing is ever minified.
+    class Round {
+      +BlackCard BlackCard
+      +Player Judge
+      +Dictionary<Player, WhiteCard> PlayerCards
+    }
 
-The result is that an active game takes ~2KB for the initial load and then about **500KB per hour** of gameplay.
+    class CardDeck {
+      +Queue<BlackCard> BlackCards
+      +Queue<WhiteCard> WhiteCards
+      +LoadAndShuffleDeck(): Task
+      +DrawBlackCard(): BlackCard
+      +DrawWhiteCard(): WhiteCard
+      +Recycle(BlackCard): void
+      +Recycle(WhiteCard): void
+    }
+```
+Here's a high-level overview of how the game flow works:
 
-### Setup
-The amount of work necessary for setting up the server is minimal: Compile the project in release mode (or download the pre-compiled binaries from the release-section), start the server-executable with admin rights (needed to be able to listen on the game port properly) and you're done - your own Cards Against Humanity Online-server is up and running.
+GameHost: The top-level class that manages multiple Lobby instances. It loads the base deck of cards from an external URL upon initialization and shuffles the base deck for each new Lobby. It can create new Lobby instances and retrieve an overall leaderboard across all lobbies.
 
-The server runs on port `31815` by default and can be accessed in the following ways:
+Lobby: Represents a game lobby. It maintains its own shuffled deck of cards and a list of Player instances. Players can join the lobby and are dealt a hand of cards when they join. The Lobby also maintains a record of Round instances, and can start new rounds and end rounds with a winning player.
 
-* Access from host PC: Use [http://localhost:31815/](http://localhost:31815/) from your local pc to access the server. This is also the only way to access the server when run in Debug-Mode.
-* Access from local network (LAN): Use your local ip address to access the server from your local LAN network (you might have to open the port in your computer's firewall), e.g. [http://192.168.1.152:31815/](http://192.168.1.152:31815/).
-* Access from the internet: use your public ip address (use a tool such as [WhatIsMyIP](http://www.whatismypublicip.com/) to find it out) to play with your friends from all over the internet (you will probably have to open the port used for the server in your router's firewall). If you do not want to find out the correct ip address every time, you can use a service such as [No-IP](https://www.noip.com/) to get a static url which redirects to your server dynamically.
+Player: Represents a player in the game. It keeps track of the player's name, score, access token, hand of cards, and whether the player has played a card in the current round.
+
+Round: Represents a round in the game. It maintains the black card in play, the judge for the round, and the cards played by each player.
+
+CardDeck: Represents a deck of cards. It is responsible for loading, shuffling, and managing the deck of black and white cards. The deck can be loaded from a CSV file at a specified URL, and the cards can be drawn and recycled as needed.
+
+This setup allows you to manage the game at a high level through the GameHost and also at a lower level (individual lobbies, players, rounds, and cards) as needed.
 
 ### Legal Notice
-This web game is based off the card game [Cards Against Humanity](https://www.cardsagainsthumanity.com/) and [JSON Against Humanity](http://www.crhallberg.com/cah/json) which are available for free under the [Creative Commons BY-NC-SA 2.0 license](https://creativecommons.org/licenses/by-nc-sa/2.0/). I am neither associated with the Cards Against Humanity LLC, creators of Cards Against Humanity, nor Chris Hallberg, the creator of JSON Against Humanity, in any way. If you should have concerns regarding the correctness of my usage of their property, please send me an email (the address is available through my profile).
+This game is a combination of the cardset from KC Lemson's Bedlam game, and the source code here has it's roots in the forked repository "Cards Against Humanity Online" (But it is a ground up rewrite of that code from scratch), this is in turn based off the card game [Cards Against Humanity](https://www.cardsagainsthumanity.com/) and [JSON Against Humanity](http://www.crhallberg.com/cah/json) which are available for free under the [Creative Commons BY-NC-SA 2.0 license](https://creativecommons.org/licenses/by-nc-sa/2.0/). I am neither associated with the Cards Against Humanity LLC, creators of Cards Against Humanity, nor Chris Hallberg, the creator of JSON Against Humanity, in any way. If you should have concerns regarding the correctness of my usage of their property, please send me an email (the address is available through my profile).
