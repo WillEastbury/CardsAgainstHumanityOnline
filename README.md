@@ -1,8 +1,10 @@
 # Bedlam Online
 
-An implementation of the Card game Bedlam by KC Lemson in C# 7.
+An implementation of the Card game Bedlam by KC Lemson in C# on .net 7.
 
+## Interactions
 ```mermaid
+
 classDiagram
     class GameHost {
       +List<BlackCard> BaseBlackCards
@@ -52,6 +54,7 @@ classDiagram
       +Recycle(WhiteCard): void
     }
 ```
+## Game Flow
 Here's a high-level overview of how the game flow works:
 
 GameHost: The top-level class that manages multiple Lobby instances. It loads the base deck of cards from an external URL upon initialization and shuffles the base deck for each new Lobby. It can create new Lobby instances and retrieve an overall leaderboard across all lobbies.
